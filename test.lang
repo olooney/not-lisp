@@ -1,0 +1,42 @@
+[ block
+  # as required by tradition
+  [ print 'hello 'world ]
+
+  # unit test framework TODO move this to a separate file...
+  [ set assert [ function [ actual expected ] [ 
+    [ if [ eq actual expected ] 
+        [ print 'passed ]
+        [ print 'failed 'because actual '!= expected ]
+    ]
+  ] ] ]
+
+  # just some generic set up
+  [ set x 3 ]
+  [ set y 4 ]
+
+  # generic length function
+  [ set length [ function [ x y ] [ 
+    [ set z [ add 
+        [ pow x 2 ] 
+        [ pow y 2 ] 
+    ] ] 
+    [ sqrt z ]
+  ] ] ] 
+
+  # calculation in the outer space
+  [ set z [ add
+    [ mul x x ]
+    [ pow y 2 ]
+  ] ]
+  [ set d [ sqrt  z ] ]
+  [ assert d 5 ]
+  [ assert [ length 5 12 ] 13 ]
+
+  # if z was correctly scoped in the function call, the outer z
+  # should still be 25 and outer x should still be 3.
+  [ assert z 25 ]
+  [ assert x 3 ]
+  [ assert y 4 ]
+]
+
+[ print 'goodbye ]

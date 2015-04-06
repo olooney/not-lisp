@@ -1,0 +1,42 @@
+[ block
+  # as required by tradition
+  [ print 'hello 'world ]
+
+  # unit test framework TODO move this to a separate file...
+  [ set assert [ function [ actual expected ] [ 
+    [ if [ eq actual expected ] 
+        [ print 'passed ]
+        [ print 'failed 'because actual '!= expected ]
+    ]
+  ] ] ]
+
+  [ set short_circuit_and [ fexpr [ x y ] [
+    [ set x [ resolve x ] ]
+    [ if x 
+        x
+        [ block
+            [ set y [ resolve y ] ]
+            [ if y y nil ]
+        ]
+    ]
+  ] ] ]
+
+  # prove that this fexpr basically acts like a logical AND
+  [ assert [ short_circuit_and 5 4 ] 5 ]
+  [ assert [ short_circuit_and 6 0 ] 6 ]
+  [ assert [ short_circuit_and 0 42 ] 42 ]
+  [ assert [ short_circuit_and nil 0 ] nil ]
+
+  # prove that evaluation DOES occur when necessary
+  [ assert [ short_circuit_and [ mul 6 7 ] [ add 2 2 ] ] 42 ]
+  [ assert [ short_circuit_and [ mul 6 0 ] [ add 2 2 ] ] 4 ]
+
+  # prove evaluation does NOT occur unless necessary
+  [ set z 1 ]
+  [ assert [ short_circuit_and [ mul 6 7 ] [ set z 2 ] ] 42 ]
+  [ assert z 1 ]
+  [ assert [ short_circuit_and [ mul 0 7 ] [ set z 3 ] ] 3 ]
+  [ assert z 3 ]
+]
+
+[ print 'goodbye ]
