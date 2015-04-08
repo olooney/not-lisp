@@ -156,6 +156,11 @@ class Promise(object):
     def do_it(self):
         return evaluate(self.expression, self.frame)
 
+    def invoke(self, frame):
+        # TODO this is terrible, I need a better way to pass
+        # arguments to a function?
+        return evaluate(self.expression, frame)
+
 
 
 def evaluate(expression, frame):
@@ -175,6 +180,11 @@ def evaluate(expression, frame):
                     return evaluate(expression[2], frame)
                 elif len(expression) >= 4:
                     return evaluate(expression[3], frame)
+            elif expression[0] == 'while':
+                result = None
+                while evaluate(expression[1], frame):
+                    result = evaluate(expression[2], frame)
+                return result
             elif expression[0] == 'block':
                 return Block( frame, expression[1:] ).do_it()
             elif expression[0] == 'function':
@@ -187,6 +197,13 @@ def evaluate(expression, frame):
                     return possible_promise.do_it()
                 else:
                     return possible_promise
+            elif expression[0] == 'invoke':
+                possible_promise = evaluate(expression[1], frame)
+                if hasattr(possible_promise, 'invoke') and callable(possible_promise.invoke):
+                    return possible_promise.invoke(frame)
+                else:
+                    return evaluate(possible_promise, frame)
+                
             else:
                 try:
                     func = evaluate(expression[0], frame)
@@ -196,6 +213,7 @@ def evaluate(expression, frame):
                         args = [ evaluate(arg, frame) for arg in expression[1:] ]
                     return func(*args)
                 except Exception as e:
+                    print expression[0]
                     raise
     elif isinstance(expression, str):
         return frame.get(expression)

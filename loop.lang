@@ -1,0 +1,39 @@
+[ block
+  
+  # raw loop, using 'while' primitive
+  [ set i 0 ]
+  [ while [ lt i 5 ] [ set i [ block
+    [ print 'hello 'number i ]
+    [ add i 1 ]
+  ] ] ]
+
+  # generic from ... to ... loop, implemented with fexpr macro
+  [ set for [ fexpr [ min to max body ] [
+    [ set index [ resolve min ] ]
+    [ set max [ add [ resolve max ] 1 ] ] 
+    [ while [ lt index max ] [ set index [ block
+      [ invoke body ]
+      [ add index 1 ]
+    ] ] ]
+  ] ] ]
+
+  # simplified for loop!
+  [ for 1 to 3 [ block
+    [ print 'hey index ]
+  ] ]
+
+  # iterative factorial
+  [ set factorial [ function [ n ] [
+    [ set f 1 ]
+    [ for 1 to n [
+        [ set f [ mul f index ] ]
+    ] ]
+    f
+  ] ] ]
+
+  # todo: doesn't work yet because f
+  # isn't defined in the correct scope...
+  # [ print '[ 'factorial '5 '] '= [ factorial 5 ] ]
+
+  [ print 'all 'done ]
+]
